@@ -11,16 +11,17 @@ fn delete_dogs(conn: &PgConnection) -> Result<usize, Error> {
     diesel::delete(dogs::table).execute(conn)
 }
 
-fn insert_dog(conn: &PgConnection, name: &str, breed: &str) -> Result<usize, Error> {
+// This returns the id of the inserted row.
+fn insert_dog(conn: &PgConnection, name: &str, breed: &str) -> Result<i32, Error> {
     let dog = NewDog {
         name: name.to_string(),
         breed: breed.to_string(),
     };
-    diesel::insert_into(dogs::table)
+    let id: i32 = diesel::insert_into(dogs::table)
         .values(&dog)
-        //.returning(id)
-        //.get_result(conn)
-        .execute(conn)
+        .returning(dogs::id)
+        .get_result(conn)?;
+    Ok(id)
 }
 
 fn insert_dogs(conn: &PgConnection) -> Result<usize, Error> {
@@ -47,12 +48,11 @@ fn report_dogs(conn: &PgConnection) {
 }
 
 /*
-fn update_dog(conn: &PgConnection, id: i32, name: String, breed: String) {
-    diesel::update(dogs.find(id))
-        .set(breed.eq(breed))
-        .set(name.eq(name))
-        .get_result::<Dog>(&conn)
-        .expect(&format!("unable to find dog {}", id));
+fn update_dog(conn: &PgConnection, id: i32, a_name: &str, a_breed: &str) -> Result<usize, Error> {
+    //let dog = {id, name: a_name, breed: a_breed};
+    diesel::update(dogs.filter(id.eq(id)))
+        .set((dogs::dsl::breed.eq(a_breed), dogs::dsl::name.eq(a_name)))
+        .execute(conn)
 }
 */
 
@@ -60,9 +60,13 @@ fn main() {
     let conn = establish_connection();
     delete_dogs(&conn).unwrap();
     insert_dogs(&conn).unwrap();
-    let id = insert_dog(&conn, "Oscar", "German Shorthaired Pointer");
 
-    //update_dog(&conn, id, "Oscar Wilde", "German Shorthaired Pointer");
+    if let Ok(id) = insert_dog(&conn, "Oscar", "German Shorthaired Pointer") {
+        //update_dog(&conn, id, "Oscar Wilde", "German Shorthaired Pointer");
+        dbg!(id);
+    } else {
+        eprintln!("error inserting dog");
+    }
 
     report_dogs(&conn);
 }
