@@ -1,8 +1,8 @@
 #[macro_use]
 extern crate diesel;
 
-pub mod models;
-pub mod schema;
+mod models;
+mod schema;
 
 use self::models::*;
 use diesel::prelude::*;
@@ -15,10 +15,10 @@ fn delete_dogs(conn: &PgConnection) -> Result<usize, Error> {
     diesel::delete(dogs::table).execute(conn)
 }
 
-fn get_connection() -> PgConnection {
+fn get_connection() -> ConnectionResult<PgConnection> {
     dotenv().ok();
     let url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    PgConnection::establish(&url).unwrap_or_else(|_| panic!("Error connecting to {}", url))
+    PgConnection::establish(&url)
 }
 
 // This returns the id of the inserted row.
@@ -66,15 +66,21 @@ fn update_dog(conn: &PgConnection, id: i32, name: &str, breed: &str) -> Result<u
 }
 
 fn main() {
-    let conn = get_connection();
-    delete_dogs(&conn).unwrap();
-    insert_dogs(&conn).unwrap();
+    match get_connection() {
+        Ok(conn) => {
+            delete_dogs(&conn).unwrap();
+            insert_dogs(&conn).unwrap();
 
-    if let Ok(id) = insert_dog(&conn, "Oscar", "German Shorthaired Pointer") {
-        update_dog(&conn, id, "Oscar Wilde", "German Shorthaired Pointer").unwrap();
-    } else {
-        eprintln!("error inserting dog");
+            if let Ok(id) = insert_dog(&conn, "Oscar", "German Shorthaired Pointer") {
+                update_dog(&conn, id, "Oscar Wilde", "German Shorthaired Pointer").unwrap();
+            } else {
+                eprintln!("error inserting dog");
+            }
+
+            report_dogs(&conn);
+        }
+        Err(e) => {
+            panic!("error connecting to database: {}", e)
+        }
     }
-
-    report_dogs(&conn);
 }
