@@ -65,17 +65,18 @@ fn update_dog(conn: &PgConnection, id: i32, name: &str, breed: &str) -> Result<u
     diesel::update(&dog).set(&dog).execute(conn)
 }
 
-fn main() {
+fn main() -> Result<(), Error> {
     match get_connection() {
         Ok(conn) => {
-            delete_dogs(&conn).unwrap();
-            insert_dogs(&conn).unwrap();
-            let id = insert_dog(&conn, "Oscar", "German Shorthaired Pointer").unwrap();
-            update_dog(&conn, id, "Oscar Wilde", "German Shorthaired Pointer").unwrap();
+            delete_dogs(&conn)?;
+            insert_dogs(&conn)?;
+            let id = insert_dog(&conn, "Oscar", "German Shorthaired Pointer")?;
+            update_dog(&conn, id, "Oscar Wilde", "German Shorthaired Pointer")?;
             report_dogs(&conn);
         }
         Err(e) => {
             panic!("error connecting to database: {}", e)
         }
     }
+    Ok(())
 }
