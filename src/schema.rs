@@ -3,7 +3,7 @@
 table! {
     dogs (id) {
         id -> Int4,
-        breed -> Nullable<Text>,
-        name -> Nullable<Text>,
+        breed -> Text,
+        name -> Text,
     }
 }
