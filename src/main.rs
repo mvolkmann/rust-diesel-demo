@@ -5,10 +5,18 @@ use self::models::*;
 use diesel::prelude::*;
 use diesel::result::Error;
 use diesel_demo::*;
+use dotenv::dotenv;
 use schema::dogs;
+use std::env;
 
 fn delete_dogs(conn: &PgConnection) -> Result<usize, Error> {
     diesel::delete(dogs::table).execute(conn)
+}
+
+fn get_connection() -> PgConnection {
+    dotenv().ok();
+    let url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    PgConnection::establish(&url).unwrap_or_else(|_| panic!("Error connecting to {}", url))
 }
 
 // This returns the id of the inserted row.
