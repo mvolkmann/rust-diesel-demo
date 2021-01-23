@@ -1,10 +1,12 @@
+#[macro_use]
 extern crate diesel;
-extern crate diesel_demo;
+
+pub mod models;
+pub mod schema;
 
 use self::models::*;
 use diesel::prelude::*;
 use diesel::result::Error;
-use diesel_demo::*;
 use dotenv::dotenv;
 use schema::dogs;
 use std::env;
