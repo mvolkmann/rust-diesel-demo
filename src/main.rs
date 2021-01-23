@@ -65,8 +65,10 @@ fn update_dog(conn: &PgConnection, id: i32, name: &str, breed: &str) -> Result<u
     diesel::update(&dog).set(&dog).execute(conn)
 }
 
-fn main() -> Result<(), Error> {
-    let conn = get_connection().unwrap();
+// The return type specified here allows using "?" for error handling
+// regardless of the specific kinds of errors that occur.
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let conn = get_connection()?;
     delete_dogs(&conn)?;
     insert_dogs(&conn)?;
     let id = insert_dog(&conn, "Oscar", "German Shorthaired Pointer")?;
