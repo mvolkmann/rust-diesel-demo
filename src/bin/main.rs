@@ -11,9 +11,8 @@ fn delete_dogs(conn: &PgConnection) -> Result<usize, Error> {
     diesel::delete(dogs::table).execute(conn)
 }
 
-fn insert_dog(conn: &PgConnection, name: &str, breed: &str) {
-    let dog = Dog {
-        id: 0,
+fn insert_dog(conn: &PgConnection, name: &str, breed: &str) -> Result<usize, Error> {
+    let dog = NewDog {
         name: name.to_string(),
         breed: breed.to_string(),
     };
@@ -21,11 +20,9 @@ fn insert_dog(conn: &PgConnection, name: &str, breed: &str) {
         .values(&dog)
         //.get_result(conn)
         .execute(conn)
-        .expect("error inserting dog")
 }
 
-/*
-fn insert_dogs(conn: &PgConnection) {
+fn insert_dogs(conn: &PgConnection) -> Result<usize, Error> {
     let dogs = [
         ("Maisey", "Treeing Walker Coonhound"),
         ("Ramsay", "Native American Indian Dog"),
@@ -34,11 +31,14 @@ fn insert_dogs(conn: &PgConnection) {
     for dog in &dogs {
         insert_dog(conn, dog.0, dog.1)?;
     }
-    Ok(dogs.len() as u64) // # of inserted rows
+    Ok(dogs.len()) // # of inserted rows
 }
 
-fn report_dogs(conn: &Connection) {
-    let results = dogs.load::<Dog>(&conn).expect("error loading dogs");
+fn report_dogs(conn: &PgConnection) {
+    let results = dogs::dsl::dogs
+        .select((WHAT GOES HERE?))
+        .load::<Dog>(&conn)
+        .expect("error loading dogs");
 
     println!("Displaying {} dogs", results.len());
     for dog in results {
@@ -46,7 +46,8 @@ fn report_dogs(conn: &Connection) {
     }
 }
 
-fn update_dog(conn: &Connection, id: i32, name: String, breed: String) {
+/*
+fn update_dog(conn: &PgConnection, id: i32, name: String, breed: String) {
     diesel::update(dogs.find(id))
         .set(breed.eq(breed))
         .set(name.eq(name))
@@ -56,18 +57,12 @@ fn update_dog(conn: &Connection, id: i32, name: String, breed: String) {
 */
 
 fn main() {
-    use self::schema::dogs::dsl::*;
-
     let conn = establish_connection();
-    delete_dogs(&conn);
-    insert_dog(&conn, "Comet", "Whippet");
+    delete_dogs(&conn).unwrap();
+    insert_dogs(&conn).unwrap();
+    //let id = insert_dog(&conn, "Oscar", "German Shorthaired Pointer");
 
-    /*
-    insert_dogs(&conn);
-
-    let id = insert_dog("Oscar", "German Shorthaired Pointer");
-    update_dog(&conn, id, "Oscar Wilde", "German Shorthaired Pointer");
+    //update_dog(&conn, id, "Oscar Wilde", "German Shorthaired Pointer");
 
     report_dogs(&conn);
-    */
 }
