@@ -1,4 +1,4 @@
-use diesel::deserialize::Queryable;
+//use diesel::deserialize::Queryable;
 
 #[derive(Queryable)]
 pub struct Dog {
