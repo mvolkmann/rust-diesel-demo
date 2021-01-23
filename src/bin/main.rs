@@ -5,21 +5,27 @@ use self::models::*;
 use diesel::prelude::*;
 use diesel::result::Error;
 use diesel_demo::*;
+use schema::dogs;
 
-fn delete_dogs(conn: &dyn Connection) -> Result<usize, Error> {
-    diesel::delete(dogs).execute(&conn)?
+fn delete_dogs(conn: &PgConnection) -> Result<usize, Error> {
+    diesel::delete(dogs::table).execute(conn)
 }
 
-/*
-fn insert_dog(conn: &Connection, name: String, breed: String) {
-    let dog = Dog { name, breed };
+fn insert_dog(conn: &PgConnection, name: &str, breed: &str) {
+    let dog = Dog {
+        id: 0,
+        name: name.to_string(),
+        breed: breed.to_string(),
+    };
     diesel::insert_into(dogs::table)
         .values(&dog)
-        .get_result(conn)
+        //.get_result(conn)
+        .execute(conn)
         .expect("error inserting dog")
 }
 
-fn insert_dogs(conn: &Connection) {
+/*
+fn insert_dogs(conn: &PgConnection) {
     let dogs = [
         ("Maisey", "Treeing Walker Coonhound"),
         ("Ramsay", "Native American Indian Dog"),
@@ -54,6 +60,7 @@ fn main() {
 
     let conn = establish_connection();
     delete_dogs(&conn);
+    insert_dog(&conn, "Comet", "Whippet");
 
     /*
     insert_dogs(&conn);
