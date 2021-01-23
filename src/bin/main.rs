@@ -41,9 +41,8 @@ fn report_dogs(conn: &PgConnection) {
         .load::<Dog>(conn)
         .expect("error loading dogs");
 
-    println!("Displaying {} dogs", results.len());
     for dog in results {
-        println!("{} is a {}.", dog.name, dog.breed);
+        println!("{} is a {} (id {}).", dog.name, dog.breed, dog.id);
     }
 }
 
@@ -57,7 +56,7 @@ fn update_dog(conn: &PgConnection, id: i32, name: &str, breed: &str) -> Result<u
 }
 
 fn main() {
-    let conn = establish_connection();
+    let conn = get_connection();
     delete_dogs(&conn).unwrap();
     insert_dogs(&conn).unwrap();
 
