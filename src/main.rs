@@ -47,6 +47,7 @@ fn report_dogs(conn: &PgConnection) {
 }
 
 // Updates the "dogs" table row with a given id.
+//TODO: How can you update just one column?
 fn update_dog(conn: &PgConnection, id: i32, name: &str, breed: &str) -> Result<usize, Error> {
     let dog = Dog {
         id,
