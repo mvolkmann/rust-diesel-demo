@@ -47,14 +47,14 @@ fn report_dogs(conn: &PgConnection) {
     }
 }
 
-/*
-fn update_dog(conn: &PgConnection, id: i32, a_name: &str, a_breed: &str) -> Result<usize, Error> {
-    //let dog = {id, name: a_name, breed: a_breed};
-    diesel::update(dogs.filter(id.eq(id)))
-        .set((dogs::dsl::breed.eq(a_breed), dogs::dsl::name.eq(a_name)))
-        .execute(conn)
+fn update_dog(conn: &PgConnection, id: i32, name: &str, breed: &str) -> Result<usize, Error> {
+    let dog = Dog {
+        id,
+        name: name.to_string(),
+        breed: breed.to_string(),
+    };
+    diesel::update(&dog).set(&dog).execute(conn)
 }
-*/
 
 fn main() {
     let conn = establish_connection();
@@ -62,8 +62,7 @@ fn main() {
     insert_dogs(&conn).unwrap();
 
     if let Ok(id) = insert_dog(&conn, "Oscar", "German Shorthaired Pointer") {
-        //update_dog(&conn, id, "Oscar Wilde", "German Shorthaired Pointer");
-        dbg!(id);
+        update_dog(&conn, id, "Oscar Wilde", "German Shorthaired Pointer").unwrap();
     } else {
         eprintln!("error inserting dog");
     }
