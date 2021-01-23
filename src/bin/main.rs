@@ -18,6 +18,7 @@ fn insert_dog(conn: &PgConnection, name: &str, breed: &str) -> Result<usize, Err
     };
     diesel::insert_into(dogs::table)
         .values(&dog)
+        //.returning(id)
         //.get_result(conn)
         .execute(conn)
 }
@@ -36,8 +37,7 @@ fn insert_dogs(conn: &PgConnection) -> Result<usize, Error> {
 
 fn report_dogs(conn: &PgConnection) {
     let results = dogs::dsl::dogs
-        .select((WHAT GOES HERE?))
-        .load::<Dog>(&conn)
+        .load::<Dog>(conn)
         .expect("error loading dogs");
 
     println!("Displaying {} dogs", results.len());
@@ -60,7 +60,7 @@ fn main() {
     let conn = establish_connection();
     delete_dogs(&conn).unwrap();
     insert_dogs(&conn).unwrap();
-    //let id = insert_dog(&conn, "Oscar", "German Shorthaired Pointer");
+    let id = insert_dog(&conn, "Oscar", "German Shorthaired Pointer");
 
     //update_dog(&conn, id, "Oscar Wilde", "German Shorthaired Pointer");
 
