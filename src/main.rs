@@ -35,18 +35,6 @@ fn insert_dog(conn: &PgConnection, name: &str, breed: &str) -> Result<i32, Error
     Ok(id)
 }
 
-fn insert_dogs(conn: &PgConnection) -> Result<usize, Error> {
-    let dogs = [
-        ("Maisey", "Treeing Walker Coonhound"),
-        ("Ramsay", "Native American Indian Dog"),
-        ("Comet", "Whippet"),
-    ];
-    for dog in &dogs {
-        insert_dog(conn, dog.0, dog.1)?;
-    }
-    Ok(dogs.len()) // # of inserted rows
-}
-
 // Outputs information about each row in the "dogs" table.
 fn report_dogs(conn: &PgConnection) {
     let results = schema::dogs::dsl::dogs
@@ -72,10 +60,23 @@ fn update_dog(conn: &PgConnection, id: i32, name: &str, breed: &str) -> Result<u
 // regardless of the specific kinds of errors that occur.
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let conn = get_connection()?;
+
     delete_dogs(&conn)?;
-    insert_dogs(&conn)?;
+
+    let dogs = [
+        ("Maisey", "Treeing Walker Coonhound"),
+        ("Ramsay", "Native American Indian Dog"),
+        ("Comet", "Whippet"),
+    ];
+    for dog in &dogs {
+        insert_dog(&conn, dog.0, dog.1)?;
+    }
+
     let id = insert_dog(&conn, "Oscar", "German Shorthaired Pointer")?;
+
     update_dog(&conn, id, "Oscar Wilde", "German Shorthaired Pointer")?;
+
     report_dogs(&conn);
+
     Ok(())
 }
