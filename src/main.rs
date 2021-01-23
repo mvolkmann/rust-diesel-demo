@@ -70,13 +70,8 @@ fn main() {
         Ok(conn) => {
             delete_dogs(&conn).unwrap();
             insert_dogs(&conn).unwrap();
-
-            if let Ok(id) = insert_dog(&conn, "Oscar", "German Shorthaired Pointer") {
-                update_dog(&conn, id, "Oscar Wilde", "German Shorthaired Pointer").unwrap();
-            } else {
-                eprintln!("error inserting dog");
-            }
-
+            let id = insert_dog(&conn, "Oscar", "German Shorthaired Pointer").unwrap();
+            update_dog(&conn, id, "Oscar Wilde", "German Shorthaired Pointer").unwrap();
             report_dogs(&conn);
         }
         Err(e) => {
