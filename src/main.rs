@@ -66,17 +66,11 @@ fn update_dog(conn: &PgConnection, id: i32, name: &str, breed: &str) -> Result<u
 }
 
 fn main() -> Result<(), Error> {
-    match get_connection() {
-        Ok(conn) => {
-            delete_dogs(&conn)?;
-            insert_dogs(&conn)?;
-            let id = insert_dog(&conn, "Oscar", "German Shorthaired Pointer")?;
-            update_dog(&conn, id, "Oscar Wilde", "German Shorthaired Pointer")?;
-            report_dogs(&conn);
-        }
-        Err(e) => {
-            panic!("error connecting to database: {}", e)
-        }
-    }
+    let conn = get_connection().unwrap();
+    delete_dogs(&conn)?;
+    insert_dogs(&conn)?;
+    let id = insert_dog(&conn, "Oscar", "German Shorthaired Pointer")?;
+    update_dog(&conn, id, "Oscar Wilde", "German Shorthaired Pointer")?;
+    report_dogs(&conn);
     Ok(())
 }
