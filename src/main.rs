@@ -65,10 +65,8 @@ fn update_name(conn: &PgConnection, id: i32, name: &str) -> Result<usize, Error>
         // can also pass a tuple of column changes
         .set(schema::dogs::name.eq(name))
         .execute(conn);
-    if let Ok(count) = result {
-        if count == 0 {
-            return Err(Error::NotFound);
-        }
+    if result == Ok(0) {
+        return Err(Error::NotFound);
     }
     result
 }
@@ -90,7 +88,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     let id = insert_dog(&conn, "Oscar", "German Shorthaired Pointer")?;
-    dbg!(id);
 
     //update_dog(&conn, id, "Oscar Wilde", "German Shorthaired Pointer")?;
     update_name(&conn, id, "Oscar Wilde")?;
