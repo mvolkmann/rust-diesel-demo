@@ -46,8 +46,8 @@ fn report_dogs(conn: &PgConnection) {
     }
 }
 
+/*
 // Updates the "dogs" table row with a given id.
-//TODO: How can you update just one column?
 fn update_dog(conn: &PgConnection, id: i32, name: &str, breed: &str) -> Result<usize, Error> {
     let dog = Dog {
         id,
@@ -55,6 +55,18 @@ fn update_dog(conn: &PgConnection, id: i32, name: &str, breed: &str) -> Result<u
         breed: breed.to_string(),
     };
     diesel::update(&dog).set(&dog).execute(conn)
+}
+*/
+
+// Updates the name of a dog with a given id in the "dogs" table.
+fn update_name(conn: &PgConnection, id: i32, name: &str) -> Result<usize, Error> {
+    let dog = schema::dogs::dsl::dogs.filter(schema::dogs::id.eq(id));
+    //TODO: How can I make this fail if no dog is found with the specified id?
+    //TODO: As it is it just doesn't update anything.
+    diesel::update(dog)
+        // can also pass a tuple of column changes
+        .set(schema::dogs::name.eq(name))
+        .execute(conn)
 }
 
 // The return type specified here allows using "?" for error handling
@@ -74,8 +86,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     let id = insert_dog(&conn, "Oscar", "German Shorthaired Pointer")?;
+    dbg!(id);
 
-    update_dog(&conn, id, "Oscar Wilde", "German Shorthaired Pointer")?;
+    //update_dog(&conn, id, "Oscar Wilde", "German Shorthaired Pointer")?;
+    update_name(&conn, id, "Oscar Wilde")?;
 
     report_dogs(&conn);
 
