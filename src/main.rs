@@ -93,7 +93,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     dbg!(id);
 
     //update_dog(&conn, id, "Oscar Wilde", "German Shorthaired Pointer")?;
-    update_name(&conn, id + 1, "Oscar Wilde")?;
+    update_name(&conn, id, "Oscar Wilde")?;
 
     report_dogs(&conn);
 
