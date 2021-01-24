@@ -61,12 +61,16 @@ fn update_dog(conn: &PgConnection, id: i32, name: &str, breed: &str) -> Result<u
 // Updates the name of a dog with a given id in the "dogs" table.
 fn update_name(conn: &PgConnection, id: i32, name: &str) -> Result<usize, Error> {
     let dog = schema::dogs::dsl::dogs.filter(schema::dogs::id.eq(id));
-    //TODO: How can I make this fail if no dog is found with the specified id?
-    //TODO: As it is it just doesn't update anything.
-    diesel::update(dog)
+    let result = diesel::update(dog)
         // can also pass a tuple of column changes
         .set(schema::dogs::name.eq(name))
-        .execute(conn)
+        .execute(conn);
+    if let Ok(count) = result {
+        if count == 0 {
+            return Err(Error::NotFound);
+        }
+    }
+    result
 }
 
 // The return type specified here allows using "?" for error handling
@@ -89,7 +93,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     dbg!(id);
 
     //update_dog(&conn, id, "Oscar Wilde", "German Shorthaired Pointer")?;
-    update_name(&conn, id, "Oscar Wilde")?;
+    update_name(&conn, id + 1, "Oscar Wilde")?;
 
     report_dogs(&conn);
 
